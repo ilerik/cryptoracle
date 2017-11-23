@@ -11,6 +11,8 @@ log = "*"
 # Tokio / hyper
 futures = "*"
 hyper = "0.11.2"
+hyper-tls = "*"
+native-tls = "*"
 tokio-core = "*"
 
 # Serde and Json / Bson / TOML crates

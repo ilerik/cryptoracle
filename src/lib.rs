@@ -11,6 +11,8 @@ extern crate log;
 extern crate tokio_core;
 extern crate futures;
 extern crate hyper;
+extern crate hyper_tls;
+extern crate native_tls;
 extern crate toml;
 #[macro_use(bson, doc)] extern crate bson;
 extern crate mongodb;
@@ -20,10 +22,11 @@ extern crate serde_json;
 
 pub mod config;
 pub mod errors;
+pub mod clients;
 
 use futures::future;
 use futures::{Future, Stream};
-use tokio_core::reactor::Core;
+use tokio_core::reactor::{Core, Handle};
 
 use bson::Bson;
 use mongodb::{Client, ThreadedClient};
@@ -31,32 +34,31 @@ use mongodb::db::ThreadedDatabase;
 
 use errors::*;
 
+use clients::cryptocompare::fetch_market_history;
+
 // Entrypoint
 pub fn run() -> Result<()> {
-    // Some preparations and configuration steps
-    pretty_env_logger::init()?;
+    // Fetch historical data from cryptocompare
+    let fetch_data = future::done(fetch_market_history(5, 1, 1));
 
-    // Create the event loop that will drive this server
-    let mut core = Core::new()?;
-    let handle = core.handle();
+    // Connect to mongodb
+    let client = Client::connect("localhost", 27017)
+        .chain_err(|| "Failed to initialize standalone client.")?;
 
-        let client = Client::connect("localhost", 27017)
-        .expect("Failed to initialize standalone client.");
-
-    let coll = client.db("test").collection("movies");
+    let coll = client.db("data").collection("btc_eth");
 
     let doc = doc! { 
         "title": "Jaws",
-        "array": [ 1, 2, 3 ],
+        "btc_eth": [ 1, 2, 3 ],
     };
 
     // Insert document into 'test.movies' collection
     coll.insert_one(doc.clone(), None)
-        .ok().expect("Failed to insert document.");
+        .ok().chain_err(|| "Failed to insert document.")?;
 
     // Find the document and receive a cursor
     let mut cursor = coll.find(Some(doc.clone()), None)
-        .ok().expect("Failed to execute find.");
+        .ok().chain_err(|| "Failed to execute find.")?;
 
     let item = cursor.next();
 
@@ -69,24 +71,6 @@ pub fn run() -> Result<()> {
         Some(Err(_)) => panic!("Failed to get next from server!"),
         None => panic!("Server returned no results!"),
     }
-    
-    // Process data
-    // core.run(future::done(Ok(|| {
-    //     // Fetch historical data on BTC\ETH rates etc
-
-    //     // And put it in MongoDB for storage
-
-    //     // Train prediction model
-
-    //     // Make predictions about future prices
-
-    //     // And put results back
-
-
-    // })
-    // .map( |_| Ok(()) )
-    // .map_err( |e| "Error" )
-    // ))?;
 
     Ok(())
 }

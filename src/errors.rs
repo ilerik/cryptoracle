@@ -20,6 +20,8 @@ error_chain! {
     foreign_links {
         StdIo(::std::io::Error);
         Hyper(::hyper::Error);
+        HyperURI(::hyper::error::UriError);
+        TLS(::native_tls::Error);
         Utf8(::std::str::Utf8Error);
         AddrParse(::std::net::AddrParseError);
         LoggerError(LoggerError);
@@ -27,7 +29,6 @@ error_chain! {
     }
 
     errors {
-        RuntimeError
 
         Launch(phase: LaunchStage) {
             description("An error occurred during startup")

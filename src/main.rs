@@ -1,6 +1,7 @@
 #![feature(use_extern_macros)]
 extern crate cryptoracle;
 
+extern crate pretty_env_logger;
 extern crate futures;
 extern crate tokio_core;
 
@@ -13,6 +14,7 @@ use tokio_core::reactor::Core;
 
 use cryptoracle::errors::*;
 use cryptoracle::run;
+
 
 //Entrypoint function that facilitates error handling
 fn main() {

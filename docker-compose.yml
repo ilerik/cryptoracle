@@ -1,0 +1,22 @@
+# Single file with all the configuration (dev\staging\prod)
+version: "3"
+services:
+
+ mongodb:
+    image: bitnami/mongodb:3.4.10-r0
+    volumes:
+      - db-data:/bitnami
+    ports:
+      - 27017:27017
+    networks:
+      - backend
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:

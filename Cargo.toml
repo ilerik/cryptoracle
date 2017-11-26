@@ -26,6 +26,7 @@ bson = "0.10.0"
 mongodb = { version = "0.3.7", features = ["ssl"] }
 
 # utils
+gnuplot = "*"
 pretty_env_logger = "*"
 
 [features]

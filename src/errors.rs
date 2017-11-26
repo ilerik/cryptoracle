@@ -1,7 +1,7 @@
-use std::fmt;
-use std::fs::File;
 use log::SetLoggerError as LoggerError;
 use toml::de::Error as TOMLError;
+use bson::EncoderError as BSONError;
+use mongodb::Error as MongoDBError;
 
 /// System startup phases
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -22,10 +22,12 @@ error_chain! {
         Hyper(::hyper::Error);
         HyperURI(::hyper::error::UriError);
         TLS(::native_tls::Error);
+        BSONError(BSONError);
         Utf8(::std::str::Utf8Error);
         AddrParse(::std::net::AddrParseError);
         LoggerError(LoggerError);
         TOMLError(TOMLError);
+        MongoDBError(MongoDBError);
     }
 
     errors {

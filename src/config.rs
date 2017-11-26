@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
-use serde::de::{Deserialize, DeserializeOwned};
+use serde::de::{DeserializeOwned};
 
 use errors::*;
 use toml;

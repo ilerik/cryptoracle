@@ -12,3 +12,6 @@
 # Secret part of configuration
 *.env
 secrets.toml
+
+# Exlude directory for output data
+/out/

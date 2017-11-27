@@ -119,22 +119,33 @@ pub fn run() -> Result<()> {
     // cursor.next() returns an Option<Result<Document>>
     match item {
         Some(Ok(doc)) => match doc.get("_id") {
-            Some(&Bson::String(ref name)) => println!("{}", name),
+            Some(&Bson::String(ref name)) => println!("Dataset {} stored successfully to MongoDB", name),
             _ => panic!("Expected dataset name to be a string!"),
         },
-        Some(Err(_)) => panic!("Failed to get next from server!"),
-        None => panic!("Server returned no results!"),
+        Some(Err(_)) => panic!("Failed to get next from MongoDB server!"),
+        None => panic!("MongoDB server returned no results!"),
     }
-    println!("Dataset {} stored successfully to MongoDB", &dataset_name);
 
-    // Ouput plots
-    let x = [0u32, 1, 2];
-    let y = [3u32, 4, 5];
+    // Prepare data for output
+    let mut times = Vec::new();
+    let mut rates_low = Vec::new();
+    let mut rates_high = Vec::new();    
+    for item in dataset.data.iter() {
+        times.push((item.time - dataset.time_from) / timestep); // convert to timestep units
+        rates_low.push(item.low);
+        rates_high.push(item.high);
+    }
+
+    // Output plots
+    println!("Generating BTC\ETH rates history plot")
     let mut fg = Figure::new();
     fg.axes2d()
-    .lines(&x, &y, &[Caption("A line"), Color("black")]);
-    fg.show();
+    .lines(&times, &rates_low, &[Caption("BTC/ETH low"), Color("red")])
+    .lines(&times, &rates_high, &[Caption("BTC/ETH high"), Color("green")]);
+    fg.set_terminal("pdfcairo", "out/data.pdf")
+    .show();
 
+    println!("Finished generating plots.");
     Ok(())
 }
 

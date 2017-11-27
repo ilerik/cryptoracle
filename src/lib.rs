@@ -137,7 +137,7 @@ pub fn run() -> Result<()> {
     }
 
     // Output plots
-    println!("Generating BTC\ETH rates history plot")
+    println!("Generating BTC/ETH rates history plot");
     let mut fg = Figure::new();
     fg.axes2d()
     .lines(&times, &rates_low, &[Caption("BTC/ETH low"), Color("red")])
